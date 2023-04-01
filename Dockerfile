@@ -1,5 +1,7 @@
 from python
 
+RUN apt-get -y install libpq-dev
+
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
