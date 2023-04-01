@@ -1,4 +1,4 @@
-from typing import AsyncIterator
+from typing import AsyncIterator, Optional
 
 from fastapi import HTTPException
 
@@ -24,9 +24,11 @@ class CreateProduct(AuthorizedController):
 
 
 class ListProduct(AuthorizedController):
-    async def call(self, limit: int, offset: int) -> AsyncIterator[Product]:
+    async def call(
+        self, limit: int, offset: int, q: Optional[str]
+    ) -> AsyncIterator[Product]:
         async with self.async_session() as session:
             async for product in DBProduct.list_all(
-                session, limit=limit, offset=offset
+                session, limit=limit, offset=offset, q=q
             ):
                 yield Product.from_orm(product)

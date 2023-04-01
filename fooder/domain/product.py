@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import AsyncIterator
+from typing import AsyncIterator, Optional
 
 from .base import Base, CommonMixin
 
@@ -24,8 +24,15 @@ class Product(Base, CommonMixin):
         return self.protein * 4 + self.carb * 4 + self.fat * 9
 
     @classmethod
-    async def list_all(cls, session: AsyncSession, offset: int, limit: int):
-        query = select(cls).offset(offset).limit(limit)
+    async def list_all(
+        cls, session: AsyncSession, offset: int, limit: int, q: Optional[str] = None
+    ) -> AsyncIterator["Product"]:
+        query = select(cls)
+
+        if q:
+            query = query.filter(cls.name.ilike(f"%{q.lower()}%"))
+
+        query = query.offset(offset).limit(limit)
         stream = await session.stream_scalars(query.order_by(cls.id))
         async for row in stream:
             yield row
