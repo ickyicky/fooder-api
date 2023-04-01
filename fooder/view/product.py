@@ -7,7 +7,7 @@ from typing import Optional
 router = APIRouter(tags=["product"])
 
 
-@router.get("/", response_model=ListProductPayload)
+@router.get("", response_model=ListProductPayload)
 async def list_product(
     request: Request,
     controller: ListProduct = Depends(ListProduct),
@@ -20,7 +20,7 @@ async def list_product(
     )
 
 
-@router.post("/", response_model=Product)
+@router.post("", response_model=Product)
 async def create_product(
     request: Request,
     data: CreateProductPayload,

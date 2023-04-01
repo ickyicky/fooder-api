@@ -7,7 +7,7 @@ from datetime import date
 router = APIRouter(tags=["diary"])
 
 
-@router.get("/", response_model=Diary)
+@router.get("", response_model=Diary)
 async def get_diary(
     request: Request,
     date: date,

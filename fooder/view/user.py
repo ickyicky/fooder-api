@@ -6,7 +6,7 @@ from ..controller.user import CreateUser
 router = APIRouter(tags=["user"])
 
 
-@router.post("/", response_model=User)
+@router.post("", response_model=User)
 async def create_user(
     request: Request,
     data: CreateUserPayload,

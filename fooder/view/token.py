@@ -8,7 +8,7 @@ from typing import Annotated
 router = APIRouter(tags=["token"])
 
 
-@router.post("/", response_model=Token)
+@router.post("", response_model=Token)
 async def create_token(
     request: Request,
     data: Annotated[OAuth2PasswordRequestForm, Depends()],
