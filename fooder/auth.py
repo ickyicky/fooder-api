@@ -14,7 +14,7 @@ from .db import get_session
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token/")
 settings = Settings()
 password_helper = PasswordHelper(pwd_context)
 
