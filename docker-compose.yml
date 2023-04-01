@@ -1,0 +1,32 @@
+version: '3'
+
+networks:
+  fooder:
+    driver: bridge
+
+services:
+  database:
+    restart: unless-stopped
+    image: postgres
+    networks:
+    - fooder
+    env_file:
+      - .env
+    platform: linux/amd64
+
+  api:
+    restart: unless-stopped
+    image: api
+    build:
+      dockerfile: Dockerfile
+      context: .
+    networks:
+    - fooder
+    env_file:
+      - .env
+    platform: linux/amd64
+    volumes:
+      - ./fooder:/opt/fooder/fooder
+    ports:
+      - "8000:8000"
+    command: "uvicorn fooder.app:app --host 0.0.0.0 --port 8000 --reload"
