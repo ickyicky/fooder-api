@@ -37,10 +37,13 @@ class CreateToken(BaseController):
 class RefreshToken(BaseController):
     async def call(self, content: RefreshTokenPayload) -> Token:
         async with self.async_session.begin() as session:
-            user = await verify_refresh_token(session, content.refresh_token)
+            current_token = await verify_refresh_token(session, content.refresh_token)
 
-            if user is None:
+            if current_token is None:
                 raise HTTPException(status_code=401, detail="Invalid token")
+
+            user = await DBUser.get(session, current_token.user_id)
+            await current_token.delete(session)
 
             refresh_token = await create_refresh_token(session, user)
             access_token = create_access_token(user)

@@ -44,7 +44,7 @@ async def authenticate_user(
 
 async def verify_refresh_token(
     session: AsyncSession, token: str
-) -> AsyncGenerator[User, None]:
+) -> AsyncGenerator[RefreshToken, None]:
     try:
         payload = jwt.decode(
             token, settings.REFRESH_SECRET_KEY, algorithms=[settings.ALGORITHM]
@@ -56,9 +56,11 @@ async def verify_refresh_token(
         return
 
     user = await User.get_by_username(session, username)
-    current_token = await RefreshToken.get_token(session, user.id)
-    if current_token is not None and current_token.token == token:
-        return user
+    if user is None:
+        return
+    current_token = await RefreshToken.get_token(session, user.id, token)
+    if current_token is not None:
+        return current_token
 
 
 def create_access_token(user: User) -> str:
