@@ -10,6 +10,7 @@ from typing import AsyncGenerator, Dict, Annotated, Optional
 from datetime import datetime, timedelta
 from .settings import Settings
 from .domain.user import User
+from .domain.token import RefreshToken
 from .db import get_session
 
 
@@ -41,7 +42,26 @@ async def authenticate_user(
     return user
 
 
-def create_access_token(user: User):
+async def verify_refresh_token(
+    session: AsyncSession, token: str
+) -> AsyncGenerator[User, None]:
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        username: str = payload.get("sub")
+        if username is None:
+            return
+    except JWTError:
+        return
+
+    user = await User.get_by_username(session, username)
+    current_token = await RefreshToken.get_token(session, user.id)
+    if current_token is not None and current_token.token == token:
+        return user
+
+
+def create_access_token(user: User) -> str:
     expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = {
         "sub": user.username,
@@ -51,6 +71,18 @@ def create_access_token(user: User):
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
     return encoded_jwt
+
+
+async def create_refresh_token(session: AsyncSession, user: User) -> RefreshToken:
+    expire = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    to_encode = {
+        "sub": user.username,
+        "exp": expire,
+    }
+    encoded_jwt = jwt.encode(
+        to_encode, settings.REFRESH_SECRET_KEY, algorithm=settings.ALGORITHM
+    )
+    return await RefreshToken.create(session, token=encoded_jwt, user_id=user.id)
 
 
 async def get_current_user(
