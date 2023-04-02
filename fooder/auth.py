@@ -47,7 +47,7 @@ async def verify_refresh_token(
 ) -> AsyncGenerator[User, None]:
     try:
         payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+            token, settings.REFRESH_SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
         username: str = payload.get("sub")
         if username is None:
