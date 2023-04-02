@@ -15,7 +15,7 @@ async def create_entry(
     return await contoller.call(data)
 
 
-@router.put("/{entry_id}", response_model=Entry)
+@router.patch("/{entry_id}", response_model=Entry)
 async def update_entry(
     request: Request,
     entry_id: int,
