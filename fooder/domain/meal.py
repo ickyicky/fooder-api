@@ -15,7 +15,7 @@ class Meal(Base, CommonMixin):
     name: Mapped[str]
     order: Mapped[int]
     diary_id: Mapped[int] = mapped_column(Integer, ForeignKey("diary.id"))
-    entries: Mapped[list[Entry]] = relationship(lazy="selectin")
+    entries: Mapped[list[Entry]] = relationship(lazy="selectin", order_by=Entry.last_changed)
 
     @property
     def calories(self) -> float:

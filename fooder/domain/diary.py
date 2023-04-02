@@ -1,18 +1,20 @@
 from sqlalchemy.orm import relationship, Mapped, mapped_column, joinedload
 from sqlalchemy import ForeignKey, Integer, Date
 from sqlalchemy import select
+from sqlalchemy.sql.selectable import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import date
 from typing import Optional
 
 from .base import Base, CommonMixin
 from .meal import Meal
+from .entry import Entry
 
 
 class Diary(Base, CommonMixin):
     """Diary represents user diary for given day"""
 
-    meals: Mapped[list[Meal]] = relationship(lazy="selectin")
+    meals: Mapped[list[Meal]] = relationship(lazy="selectin", order_by=Meal.order)
     date: Mapped[date] = mapped_column(Date)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
 
@@ -47,6 +49,18 @@ class Diary(Base, CommonMixin):
         :rtype: float
         """
         return sum(meal.fat for meal in self.meals)
+
+    @classmethod
+    def query(cls, user_id: int) -> Select:
+        """get_all."""
+        query = (
+            select(cls)
+            .where(cls.user_id == user_id)
+            .options(
+                joinedload(cls.meals).joinedload(Meal.entries).joinedload(Entry.product)
+            )
+        )
+        return query
 
     @classmethod
     async def get_diary(
