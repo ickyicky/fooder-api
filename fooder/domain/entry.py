@@ -79,7 +79,7 @@ class Entry(Base, CommonMixin):
         except IntegrityError:
             raise AssertionError("meal or product does not exist")
 
-        entry = await cls.get_by_id(session, entry.id)
+        entry = await cls._get_by_id(session, entry.id)
         if not entry:
             raise RuntimeError()
         return entry
@@ -111,9 +111,33 @@ class Entry(Base, CommonMixin):
                 raise AssertionError("product does not exist")
 
     @classmethod
-    async def get_by_id(cls, session: AsyncSession, id: int) -> "Optional[Entry]":
+    async def _get_by_id(cls, session: AsyncSession, id: int) -> "Optional[Entry]":
         """get_by_id."""
         query = select(cls).where(cls.id == id).options(joinedload(cls.product))
+        return await session.scalar(query.order_by(cls.id))
+
+    @classmethod
+    async def get_by_id(
+        cls, session: AsyncSession, user_id: int, id: int
+    ) -> "Optional[Entry]":
+        """get_by_id."""
+        from .diary import Diary
+        from .meal import Meal
+
+        query = (
+            select(cls)
+            .where(cls.id == id)
+            .join(
+                Meal,
+            )
+            .join(
+                Diary,
+            )
+            .where(
+                Diary.user_id == user_id,
+            )
+            .options(joinedload(cls.product))
+        )
         return await session.scalar(query.order_by(cls.id))
 
     async def delete(self, session) -> None:

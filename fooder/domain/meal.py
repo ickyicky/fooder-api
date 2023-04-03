@@ -15,7 +15,9 @@ class Meal(Base, CommonMixin):
     name: Mapped[str]
     order: Mapped[int]
     diary_id: Mapped[int] = mapped_column(Integer, ForeignKey("diary.id"))
-    entries: Mapped[list[Entry]] = relationship(lazy="selectin", order_by=Entry.last_changed)
+    entries: Mapped[list[Entry]] = relationship(
+        lazy="selectin", order_by=Entry.last_changed
+    )
 
     @property
     def calories(self) -> float:
@@ -72,13 +74,29 @@ class Meal(Base, CommonMixin):
         except IntegrityError:
             raise AssertionError("diary does not exist")
 
-        meal = await cls.get_by_id(session, meal.id)
+        meal = await cls._get_by_id(session, meal.id)
         if not meal:
             raise RuntimeError()
         return meal
 
     @classmethod
-    async def get_by_id(cls, session: AsyncSession, id: int) -> "Optional[Meal]":
+    async def _get_by_id(cls, session: AsyncSession, id: int) -> "Optional[Meal]":
         """get_by_id."""
         query = select(cls).where(cls.id == id).options(joinedload(cls.entries))
+        return await session.scalar(query.order_by(cls.id))
+
+    @classmethod
+    async def get_by_id(
+        cls, session: AsyncSession, user_id: int, id: int
+    ) -> "Optional[Meal]":
+        """get_by_id."""
+        from .diary import Diary
+
+        query = (
+            select(cls)
+            .where(cls.id == id)
+            .join(Diary)
+            .where(Diary.user_id == user_id)
+            .options(joinedload(cls.entries))
+        )
         return await session.scalar(query.order_by(cls.id))

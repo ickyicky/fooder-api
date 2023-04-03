@@ -14,7 +14,9 @@ from .entry import Entry
 class Diary(Base, CommonMixin):
     """Diary represents user diary for given day"""
 
-    meals: Mapped[list[Meal]] = relationship(lazy="selectin", order_by=Meal.order)
+    meals: Mapped[list[Meal]] = relationship(
+        lazy="selectin", order_by=Meal.order.desc()
+    )
     date: Mapped[date] = mapped_column(Date)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
 
@@ -67,7 +69,7 @@ class Diary(Base, CommonMixin):
         cls, session: AsyncSession, user_id: int, date: date
     ) -> "Optional[Diary]":
         """get_diary."""
-        query = select(cls).where(cls.user_id == user_id).where(cls.date == date)
+        query = cls.query(user_id).where(cls.date == date)
         return await session.scalar(query)
 
     @classmethod
@@ -95,10 +97,12 @@ class Diary(Base, CommonMixin):
         cls, session: AsyncSession, user_id: int, id: int
     ) -> "Optional[Diary]":
         """get_by_id."""
-        query = (
-            select(cls)
-            .where(cls.user_id == user_id)
-            .where(cls.id == id)
-            .options(joinedload(cls.meals))
-        )
+        query = cls.query(user_id).where(cls.id == id)
         return await session.scalar(query)
+
+    @classmethod
+    async def has_permission(cls, session: AsyncSession, user_id: int, id: int) -> bool:
+        """has_permission."""
+        query = select(cls.id).where(cls.user_id == user_id).where(cls.id == id)
+        obj = await session.scalar(query)
+        return obj is not None
