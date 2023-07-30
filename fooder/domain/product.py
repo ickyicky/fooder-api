@@ -72,6 +72,7 @@ class Product(Base, CommonMixin):
             protein=protein,
             carb=carb,
             fat=fat,
+            fiber=fiber,
         )
         session.add(product)
         await session.flush()
