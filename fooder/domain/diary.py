@@ -52,6 +52,14 @@ class Diary(Base, CommonMixin):
         """
         return sum(meal.fat for meal in self.meals)
 
+    @property
+    def fiber(self) -> float:
+        """fiber.
+
+        :rtype: float
+        """
+        return sum(meal.fat for meal in self.meals)
+
     @classmethod
     def query(cls, user_id: int) -> Select:
         """get_all."""

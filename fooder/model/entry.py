@@ -15,9 +15,10 @@ class Entry(BaseModel):
     protein: float
     carb: float
     fat: float
+    fiber: float
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CreateEntryPayload(BaseModel):

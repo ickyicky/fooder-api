@@ -1,5 +1,6 @@
 fastapi
 pydantic
+pydantic_settings
 sqlalchemy[postgresql_asyncpg]
 uvicorn[standard]
 asyncpg

@@ -51,6 +51,14 @@ class Meal(Base, CommonMixin):
         """
         return sum(entry.fat for entry in self.entries)
 
+    @property
+    def fiber(self) -> float:
+        """fiber.
+
+        :rtype: float
+        """
+        return sum(entry.fiber for entry in self.entries)
+
     @classmethod
     async def create(
         cls,

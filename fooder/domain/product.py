@@ -14,6 +14,7 @@ class Product(Base, CommonMixin):
     protein: Mapped[float]
     carb: Mapped[float]
     fat: Mapped[float]
+    fiber: Mapped[float]
 
     @property
     def calories(self) -> float:
@@ -21,7 +22,7 @@ class Product(Base, CommonMixin):
 
         :rtype: float
         """
-        return self.protein * 4 + self.carb * 4 + self.fat * 9
+        return self.protein * 4 + self.carb * 4 + self.fat * 9 + self.fiber * 2
 
     @classmethod
     async def list_all(
@@ -39,15 +40,23 @@ class Product(Base, CommonMixin):
 
     @classmethod
     async def create(
-        cls, session: AsyncSession, name: str, carb: float, protein: float, fat: float
+        cls,
+        session: AsyncSession,
+        name: str,
+        carb: float,
+        protein: float,
+        fat: float,
+        fiber: float,
     ) -> "Product":
         # validation here
         assert carb <= 100, "carb must be less than 100"
         assert protein <= 100, "protein must be less than 100"
         assert fat <= 100, "fat must be less than 100"
+        assert fiber <= 100, "fiber must be less than 100"
         assert carb >= 0, "carb must be greater than 0"
         assert protein >= 0, "protein must be greater than 0"
         assert fat >= 0, "fat must be greater than 0"
+        assert fiber >= 0, "fiber must be greater than 0"
         assert carb + protein + fat <= 100, "total must be less than 100"
 
         # to avoid duplicates in the database keep name as lower

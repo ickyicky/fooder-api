@@ -5,7 +5,7 @@ class User(BaseModel):
     username: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CreateUserPayload(BaseModel):

@@ -13,11 +13,12 @@ class Meal(BaseModel):
     protein: float
     carb: float
     fat: float
+    fiber: float
     entries: List[Entry]
     diary_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CreateMealPayload(BaseModel):

@@ -17,6 +17,7 @@ class CreateProduct(AuthorizedController):
                     content.carb,
                     content.protein,
                     content.fat,
+                    content.fiber,
                 )
                 return Product.from_orm(product)
             except AssertionError as e:

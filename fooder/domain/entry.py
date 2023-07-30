@@ -61,6 +61,14 @@ class Entry(Base, CommonMixin):
         """
         return self.amount * self.product.fat
 
+    @property
+    def fiber(self) -> float:
+        """fiber.
+
+        :rtype: float
+        """
+        return self.amount * self.product.fiber
+
     @classmethod
     async def create(
         cls, session: AsyncSession, meal_id: int, product_id: int, grams: float
