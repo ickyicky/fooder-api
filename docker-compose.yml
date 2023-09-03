@@ -15,7 +15,7 @@ services:
 
   api:
     restart: unless-stopped
-    image: api
+    image: registry.domandoman.xyz/fooder/api
     build:
       dockerfile: Dockerfile
       context: .
