@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import AsyncIterator, Optional
 
 from .base import Base, CommonMixin
+from .user import User
 
 
 class Product(Base, CommonMixin):
@@ -34,6 +35,35 @@ class Product(Base, CommonMixin):
             query = query.filter(cls.name.ilike(f"%{q.lower()}%"))
 
         query = query.offset(offset).limit(limit)
+        stream = await session.stream_scalars(query.order_by(cls.id))
+        async for row in stream:
+            yield row
+
+    @classmethod
+    async def list_all_for_user(
+        cls,
+        session: AsyncSession,
+        offset: int,
+        limit: int,
+        user: User,
+        q: Optional[str] = None,
+    ) -> AsyncIterator["Product"]:
+        from .meal import Meal
+        from .diary import Diary
+        from .entry import Entry
+
+        query = (
+            select(cls)
+            .join(Entry, isouter=True)
+            .join(Meal, isouter=True)
+            .join(Diary, isouter=True)
+            .where(Diary.user_id == user.id)
+        )
+
+        if q:
+            query = query.filter(cls.name.ilike(f"%{q.lower()}%"))
+
+        query = query.order_by(Entry.last_changed.desc()).offset(offset).limit(limit)
         stream = await session.stream_scalars(query.order_by(cls.id))
         async for row in stream:
             yield row
