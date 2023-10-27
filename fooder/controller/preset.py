@@ -12,7 +12,7 @@ class ListPresets(AuthorizedController):
     ) -> AsyncIterator[Preset]:
         async with self.async_session() as session:
             async for preset in DBPreset.list_all(
-                session, limit=limit, offset=offset, q=q
+                session, user_id=self.user.id, limit=limit, offset=offset, q=q
             ):
                 yield Preset.from_orm(preset)
 

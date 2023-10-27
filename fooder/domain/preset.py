@@ -80,12 +80,19 @@ class Preset(Base, CommonMixin):
 
     @classmethod
     async def list_all(
-        cls, session: AsyncSession, offset: int, limit: int, q: Optional[str] = None
+        cls,
+        session: AsyncSession,
+        user_id: int,
+        offset: int,
+        limit: int,
+        q: Optional[str] = None,
     ) -> AsyncIterator["Preset"]:
         query = select(cls)
 
         if q:
-            query = query.filter(cls.name.ilike(f"%{q.lower()}%"))
+            query = query.filter(cls.user_id == user_id).filter(
+                cls.name.ilike(f"%{q.lower()}%")
+            )
 
         query = query.offset(offset).limit(limit)
         stream = await session.stream_scalars(query.order_by(cls.id))
