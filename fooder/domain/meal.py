@@ -142,3 +142,10 @@ class Meal(Base, CommonMixin):
             .options(joinedload(cls.entries))
         )
         return await session.scalar(query.order_by(cls.id))
+
+    async def delete(self, session: AsyncSession) -> None:
+        """delete."""
+        for entry in self.entries:
+            await session.delete(entry)
+        await session.delete(self)
+        await session.flush()

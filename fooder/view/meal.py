@@ -6,7 +6,7 @@ from ..model.meal import (
     SaveMealPayload,
     CreateMealFromPresetPayload,
 )
-from ..controller.meal import CreateMeal, SaveMeal, CreateMealFromPreset
+from ..controller.meal import CreateMeal, SaveMeal, CreateMealFromPreset, DeleteMeal
 
 
 router = APIRouter(tags=["meal"])
@@ -29,6 +29,15 @@ async def save_meal(
     contoller: SaveMeal = Depends(SaveMeal),
 ):
     return await contoller.call(meal_id, data)
+
+
+@router.delete("/{meal_id}")
+async def delete_meal(
+    request: Request,
+    meal_id: int,
+    contoller: DeleteMeal = Depends(DeleteMeal),
+):
+    return await contoller.call(meal_id)
 
 
 @router.post("/from_preset", response_model=Meal)

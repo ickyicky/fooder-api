@@ -47,6 +47,19 @@ class SaveMeal(AuthorizedController):
                 raise HTTPException(status_code=400, detail=e.args[0])
 
 
+class DeleteMeal(AuthorizedController):
+    async def call(self, meal_id: id) -> None:
+        async with self.async_session.begin() as session:
+            meal = await DBMeal.get_by_id(session, self.user.id, meal_id)
+            if meal is None:
+                raise HTTPException(status_code=404, detail="meal not found")
+
+            try:
+                await meal.delete(session)
+            except AssertionError as e:
+                raise HTTPException(status_code=400, detail=e.args[0])
+
+
 class CreateMealFromPreset(AuthorizedController):
     async def call(self, content: CreateMealFromPresetPayload) -> Meal:
         async with self.async_session.begin() as session:
