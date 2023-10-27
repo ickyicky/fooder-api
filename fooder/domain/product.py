@@ -4,7 +4,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import AsyncIterator, Optional
 
 from .base import Base, CommonMixin
-from .user import User
 
 
 class Product(Base, CommonMixin):

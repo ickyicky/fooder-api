@@ -5,3 +5,5 @@ from .meal import Meal
 from .product import Product
 from .user import User
 from .token import RefreshToken
+from .preset import Preset
+from .preset_entry import PresetEntry

@@ -5,6 +5,7 @@ from .view.meal import router as meal_router
 from .view.entry import router as entry_router
 from .view.token import router as token_router
 from .view.user import router as user_router
+from .view.preset import router as preset_router
 
 
 router = APIRouter(prefix="/api")
@@ -14,3 +15,4 @@ router.include_router(meal_router, prefix="/meal", tags=["meal"])
 router.include_router(entry_router, prefix="/entry", tags=["entry"])
 router.include_router(token_router, prefix="/token", tags=["token"])
 router.include_router(user_router, prefix="/user", tags=["user"])
+router.include_router(preset_router, prefix="/preset", tags=["preset"])

@@ -7,6 +7,7 @@ from typing import Optional
 
 from .base import Base, CommonMixin
 from .entry import Entry
+from .preset import Preset
 
 
 class Meal(Base, CommonMixin):
@@ -81,6 +82,39 @@ class Meal(Base, CommonMixin):
             await session.flush()
         except IntegrityError:
             raise AssertionError("diary does not exist")
+
+        meal = await cls._get_by_id(session, meal.id)
+        if not meal:
+            raise RuntimeError()
+        return meal
+
+    @classmethod
+    async def create_from_preset(
+        cls,
+        session: AsyncSession,
+        diary_id: int,
+        order: int,
+        name: Optional[str],
+        preset: Preset,
+    ) -> "Meal":
+        # check if order already exists in diary
+        query = select(cls).where(cls.diary_id == diary_id).where(cls.order == order)
+        existing_meal = await session.scalar(query)
+        assert existing_meal is None, "order already exists in diary"
+
+        if name is None:
+            name = preset.name or f"Meal {order}"
+
+        meal = Meal(diary_id=diary_id, name=name, order=order)
+        session.add(meal)
+
+        try:
+            await session.flush()
+        except IntegrityError:
+            raise AssertionError("diary does not exist")
+
+        for entry in preset.entries:
+            await Entry.create(session, meal.id, entry.product_id, entry.grams)
 
         meal = await cls._get_by_id(session, meal.id)
         if not meal:

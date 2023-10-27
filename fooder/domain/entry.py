@@ -107,14 +107,14 @@ class Entry(Base, CommonMixin):
         if meal_id is not None:
             self.meal_id = meal_id
             try:
-                session.flush()
+                await session.flush()
             except IntegrityError:
                 raise AssertionError("meal does not exist")
 
         if product_id is not None:
             self.product_id = product_id
             try:
-                session.flush()
+                await session.flush()
             except IntegrityError:
                 raise AssertionError("product does not exist")
 
