@@ -87,12 +87,10 @@ class Preset(Base, CommonMixin):
         limit: int,
         q: Optional[str] = None,
     ) -> AsyncIterator["Preset"]:
-        query = select(cls)
+        query = select(cls).filter(cls.user_id == user_id)
 
         if q:
-            query = query.filter(cls.user_id == user_id).filter(
-                cls.name.ilike(f"%{q.lower()}%")
-            )
+            query = query.filter(cls.name.ilike(f"%{q.lower()}%"))
 
         query = query.offset(offset).limit(limit)
         stream = await session.stream_scalars(query.order_by(cls.id))
