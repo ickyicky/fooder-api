@@ -86,3 +86,18 @@ def test_create_meal_from_preset(client, meal_from_preset):
             continue
 
         assert meal[k] == v, f"{k} != {v}"
+
+
+@pytest.mark.dependency(depends=["test_list_presets"])
+def test_delete_preset(client):
+    presets = client.get("preset").json()["presets"]
+    preset_id = presets[0]["id"]
+
+    response = client.get(f"preset/{preset_id}")
+    assert response.status_code == 200, response.json()
+
+    response = client.delete(f"preset/{preset_id}")
+    assert response.status_code == 200, response.json()
+
+    response = client.get(f"preset/{preset_id}")
+    assert response.status_code == 404, response.json()

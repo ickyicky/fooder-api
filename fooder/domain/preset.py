@@ -104,3 +104,9 @@ class Preset(Base, CommonMixin):
             .options(joinedload(cls.entries).joinedload(PresetEntry.product))
         )
         return await session.scalar(query)
+
+    async def delete(self, session: AsyncSession) -> None:
+        for entry in self.entries:
+            await session.delete(entry)
+        await session.delete(self)
+        await session.flush()

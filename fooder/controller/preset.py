@@ -1,6 +1,7 @@
 from typing import AsyncIterator, Optional
+from fastapi import HTTPException
 
-from ..model.preset import Preset
+from ..model.preset import Preset, PresetDetails
 from ..domain.preset import Preset as DBPreset
 from .base import AuthorizedController
 
@@ -14,3 +15,28 @@ class ListPresets(AuthorizedController):
                 session, limit=limit, offset=offset, q=q
             ):
                 yield Preset.from_orm(preset)
+
+
+class GetPreset(AuthorizedController):
+    async def call(self, id: int) -> PresetDetails:
+        async with self.async_session() as session:
+            preset = await DBPreset.get(session, self.user.id, id)
+
+            if preset is not None:
+                return PresetDetails.from_orm(preset)
+
+            raise HTTPException(status_code=404, detail="preset not found")
+
+
+class DeletePreset(AuthorizedController):
+    async def call(
+        self,
+        id: int,
+    ) -> AsyncIterator[Preset]:
+        async with self.async_session.begin() as session:
+            preset = await DBPreset.get(session, self.user.id, id)
+
+            if preset is None:
+                raise HTTPException(status_code=404, detail="preset not found")
+
+            await preset.delete(session)
