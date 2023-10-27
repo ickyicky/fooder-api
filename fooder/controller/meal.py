@@ -6,6 +6,7 @@ from ..model.meal import (
     SaveMealPayload,
     CreateMealFromPresetPayload,
 )
+from ..model.preset import Preset
 from ..domain.meal import Meal as DBMeal
 from ..domain.diary import Diary as DBDiary
 from ..domain.preset import Preset as DBPreset
@@ -30,15 +31,17 @@ class CreateMeal(AuthorizedController):
 
 
 class SaveMeal(AuthorizedController):
-    async def call(self, meal_id: id, payload: SaveMealPayload) -> None:
+    async def call(self, meal_id: id, payload: SaveMealPayload) -> Preset:
         async with self.async_session.begin() as session:
             meal = await DBMeal.get_by_id(session, self.user.id, meal_id)
             if meal is None:
                 raise HTTPException(status_code=404, detail="meal not found")
 
             try:
-                await DBPreset.create(
-                    session, user_id=self.user.id, name=payload.name, meal=meal
+                return Preset.from_orm(
+                    await DBPreset.create(
+                        session, user_id=self.user.id, name=payload.name, meal=meal
+                    )
                 )
             except AssertionError as e:
                 raise HTTPException(status_code=400, detail=e.args[0])

@@ -3,7 +3,9 @@ import pytest
 
 
 @pytest.mark.dependency()
-def test_create_meal(client, meal_payload_factory):
+def test_create_meal(
+    client, meal_payload_factory, product_payload_factory, entry_payload_factory
+):
     today = datetime.date.today().isoformat()
     response = client.get("diary", params={"date": today})
 
@@ -13,17 +15,34 @@ def test_create_meal(client, meal_payload_factory):
     response = client.post("meal", json=meal_payload_factory(diary_id, meal_order))
     assert response.status_code == 200, response.json()
 
+    meal_id = response.json()["id"]
+
+    product_id = client.post("product", json=product_payload_factory()).json()["id"]
+
+    entry_payload = entry_payload_factory(meal_id, product_id, 100.0)
+    response = client.post("entry", json=entry_payload)
+    assert response.status_code == 200, response.json()
+
 
 @pytest.mark.dependency(depends=["test_create_meal"])
 def test_save_meal(client, meal_save_payload):
     today = datetime.date.today().isoformat()
     response = client.get("diary", params={"date": today})
 
-    meal_id = response.json()["meals"][0]["id"]
+    meal = response.json()["meals"][0]
+    meal_id = meal["id"]
     save_payload = meal_save_payload(meal_id)
 
     response = client.post(f"meal/{meal_id}/save", json=save_payload)
     assert response.status_code == 200, response.json()
+
+    preset = response.json()
+
+    for k, v in preset.items():
+        if k in ("id", "name", "entries"):
+            continue
+
+        assert meal[k] == v, f"{k} != {v}"
 
 
 @pytest.mark.dependency(depends=["test_create_meal"])

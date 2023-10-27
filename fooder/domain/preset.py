@@ -74,7 +74,9 @@ class Preset(Base, CommonMixin):
             raise RuntimeError()
 
         for entry in meal.entries:
-            PresetEntry.create(session, preset.id, entry)
+            await PresetEntry.create(session, preset.id, entry)
+
+        return await cls.get(session, user_id, preset.id)
 
     @classmethod
     async def list_all(

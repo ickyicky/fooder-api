@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Request
+from ..model.preset import Preset
 from ..model.meal import (
     Meal,
     CreateMealPayload,
@@ -20,14 +21,14 @@ async def create_meal(
     return await contoller.call(data)
 
 
-@router.post("/{meal_id}/save")
+@router.post("/{meal_id}/save", response_model=Preset)
 async def save_meal(
     request: Request,
     meal_id: int,
     data: SaveMealPayload,
     contoller: SaveMeal = Depends(SaveMeal),
 ):
-    await contoller.call(meal_id, data)
+    return await contoller.call(meal_id, data)
 
 
 @router.post("/from_preset", response_model=Meal)
