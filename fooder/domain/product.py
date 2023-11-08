@@ -31,7 +31,11 @@ class Product(Base, CommonMixin):
         query = select(cls)
 
         if q:
-            query = query.filter(cls.name.ilike(f"%{q.lower()}%"))
+            q_list = q.split()
+            for qq in q_list:
+                query = query.filter(
+                    cls.name.ilike(f"%{qq.lower()}%")
+                )
 
         query = query.offset(offset).limit(limit)
         stream = await session.stream_scalars(query.order_by(cls.id))
