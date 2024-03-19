@@ -65,13 +65,14 @@ class Meal(Base, CommonMixin):
         cls,
         session: AsyncSession,
         diary_id: int,
-        order: int = 0,
         name: Optional[str] = None,
     ) -> "Meal":
         # check if order already exists in diary
-        query = select(cls).where(cls.diary_id == diary_id).where(cls.order == order)
+        query = (
+            select(cls.order).where(cls.diary_id == diary_id).order_by(cls.order.desc())
+        )
         existing_meal = await session.scalar(query)
-        assert existing_meal is None, "order already exists in diary"
+        order = existing_meal + 1 if existing_meal else 1
 
         if name is None:
             name = f"Meal {order}"
@@ -93,14 +94,15 @@ class Meal(Base, CommonMixin):
         cls,
         session: AsyncSession,
         diary_id: int,
-        order: int,
         name: Optional[str],
         preset: Preset,
     ) -> "Meal":
         # check if order already exists in diary
-        query = select(cls).where(cls.diary_id == diary_id).where(cls.order == order)
+        query = (
+            select(cls.order).where(cls.diary_id == diary_id).order_by(cls.order.desc())
+        )
         existing_meal = await session.scalar(query)
-        assert existing_meal is None, "order already exists in diary"
+        order = existing_meal + 1 if existing_meal else 1
 
         if name is None:
             name = preset.name or f"Meal {order}"

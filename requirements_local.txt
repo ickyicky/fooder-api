@@ -6,3 +6,4 @@ uvicorn[standard]
 python-jose[cryptography]
 passlib[bcrypt]
 fastapi-users
+pytest

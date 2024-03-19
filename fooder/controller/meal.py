@@ -22,9 +22,7 @@ class CreateMeal(AuthorizedController):
                 raise HTTPException(status_code=404, detail="not found")
 
             try:
-                meal = await DBMeal.create(
-                    session, content.diary_id, content.order, content.name
-                )
+                meal = await DBMeal.create(session, content.diary_id, content.name)
                 return Meal.from_orm(meal)
             except AssertionError as e:
                 raise HTTPException(status_code=400, detail=e.args[0])
@@ -75,7 +73,7 @@ class CreateMealFromPreset(AuthorizedController):
 
             try:
                 meal = await DBMeal.create_from_preset(
-                    session, content.diary_id, content.order, content.name, preset
+                    session, content.diary_id, content.name, preset
                 )
                 return Meal.from_orm(meal)
             except AssertionError as e:

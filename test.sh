@@ -54,7 +54,7 @@ ${DC} exec api bash -c "python -m fooder --create-tables"
 
 # finally run tests
 set -xe
-pytest fooder -sv -k "${TESTS}"
+python -m pytest fooder -sv -k "${TESTS}"
 
 # clean up after tests
 echo "cleaning up..."

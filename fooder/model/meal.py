@@ -25,7 +25,6 @@ class CreateMealPayload(BaseModel):
     """CreateMealPayload."""
 
     name: Optional[str]
-    order: int
     diary_id: int
 
 
@@ -39,6 +38,5 @@ class CreateMealFromPresetPayload(BaseModel):
     """CreateMealPayload."""
 
     name: Optional[str]
-    order: int
     diary_id: int
     preset_id: int
