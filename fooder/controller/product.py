@@ -46,7 +46,7 @@ class GetProductByBarCode(AuthorizedController):
 
             try:
                 product_data = product_finder.find(barcode)
-            except product_finder.ProductNotFound:
+            except product_finder.NotFound:
                 raise HTTPException(status_code=404, detail="Product not found")
             except product_finder.ParseError:
                 raise HTTPException(
