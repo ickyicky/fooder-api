@@ -25,3 +25,9 @@ def test_list_product(client):
 def test_get_product_by_barcode(client):
     response = client.get("product/by_barcode", params={"barcode": "4056489666028"})
     assert response.status_code == 200, response.json()
+
+    name = response.json()["name"]
+
+    response = client.get("product", params={"q": name})
+    assert response.status_code == 200, response.json()
+    assert len(response.json()["products"]) == 1
