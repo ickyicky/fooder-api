@@ -1,5 +1,4 @@
 import pytest
-import datetime
 
 
 @pytest.mark.dependency()
@@ -20,3 +19,9 @@ def test_list_product(client):
     for product in data:
         assert product["id"] not in product_ids
         product_ids.add(product["id"])
+
+
+@pytest.mark.dependency(depends=["test_create_product"])
+def test_get_product_by_barcode(client):
+    response = client.get("product/by_barcode", params={"barcode": "4056489666028"})
+    assert response.status_code == 200, response.json()

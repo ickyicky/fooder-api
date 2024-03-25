@@ -7,3 +7,5 @@ python-jose[cryptography]
 passlib[bcrypt]
 fastapi-users
 pytest
+requests
+black

@@ -15,6 +15,8 @@ class Product(Base, CommonMixin):
     carb: Mapped[float]
     fat: Mapped[float]
     fiber: Mapped[float]
+    hard_coded_calories: Mapped[Optional[float]] = None
+    barcode: Mapped[Optional[str]] = None
 
     @property
     def calories(self) -> float:
@@ -22,11 +24,18 @@ class Product(Base, CommonMixin):
 
         :rtype: float
         """
+        if self.hard_coded_calories:
+            return self.hard_coded_calories
+
         return self.protein * 4 + self.carb * 4 + self.fat * 9 + self.fiber * 2
 
     @classmethod
     async def list_all(
-        cls, session: AsyncSession, offset: int, limit: int, q: Optional[str] = None
+        cls,
+        session: AsyncSession,
+        offset: int,
+        limit: int,
+        q: Optional[str] = None,
     ) -> AsyncIterator["Product"]:
         query = select(cls)
 
@@ -41,6 +50,13 @@ class Product(Base, CommonMixin):
             yield row
 
     @classmethod
+    async def get_by_barcode(
+        cls, session: AsyncSession, barcode: str
+    ) -> Optional["Product"]:
+        query = select(cls).where(cls.barcode == barcode)
+        return await session.scalar(query)
+
+    @classmethod
     async def create(
         cls,
         session: AsyncSession,
@@ -49,6 +65,8 @@ class Product(Base, CommonMixin):
         protein: float,
         fat: float,
         fiber: float,
+        hard_coded_calories: Optional[float] = None,
+        barcode: Optional[str] = None,
     ) -> "Product":
         # validation here
         assert carb <= 100, "carb must be less than 100"
@@ -65,7 +83,11 @@ class Product(Base, CommonMixin):
         name = name.lower()
 
         # check if product already exists
-        query = select(cls).where(cls.name == name)
+        if barcode is not None:
+            query = select(cls).where((cls.name == name) | (cls.barcode == barcode))
+        else:
+            query = select(cls).where(cls.name == name)
+
         existing_product = await session.scalar(query)
         assert existing_product is None, "product already exists"
 
@@ -75,7 +97,10 @@ class Product(Base, CommonMixin):
             carb=carb,
             fat=fat,
             fiber=fiber,
+            hard_coded_calories=hard_coded_calories,
+            barcode=barcode,
         )
+
         session.add(product)
         await session.flush()
         return product
