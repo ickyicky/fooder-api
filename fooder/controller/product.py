@@ -66,6 +66,8 @@ class GetProductByBarCode(AuthorizedController):
                 )
                 await session.commit()
 
-                return Product.from_orm(await DBProduct.get_by_barcode(session, barcode))
+                return Product.from_orm(
+                    await DBProduct.get_by_barcode(session, barcode)
+                )
             except AssertionError as e:
                 raise HTTPException(status_code=400, detail=e.args[0])
