@@ -9,3 +9,5 @@ fastapi-users
 pytest
 requests
 black
+flake8
+flake8-bugbear

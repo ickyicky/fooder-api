@@ -1,5 +1,4 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, declared_attr
-from sqlalchemy import Integer
 
 
 class Base(DeclarativeBase):

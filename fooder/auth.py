@@ -3,10 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from jose import JWTError, jwt
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, HTTPException
 from fastapi_users.password import PasswordHelper
-from sqlalchemy.ext.asyncio import async_sessionmaker
-from typing import AsyncGenerator, Dict, Annotated, Optional
+from typing import AsyncGenerator, Annotated
 from datetime import datetime, timedelta
 from .settings import Settings
 from .domain.user import User

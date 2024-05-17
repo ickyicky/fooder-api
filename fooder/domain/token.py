@@ -1,4 +1,4 @@
-from sqlalchemy.orm import relationship, Mapped, mapped_column, joinedload, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey, Integer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession

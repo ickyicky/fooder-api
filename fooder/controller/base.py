@@ -2,7 +2,7 @@ from typing import Annotated, Any
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from ..db import get_session
-from ..auth import get_current_user, oauth2_scheme
+from ..auth import get_current_user
 from ..domain.user import User
 
 

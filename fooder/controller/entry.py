@@ -1,4 +1,3 @@
-from typing import AsyncIterator
 from fastapi import HTTPException
 
 from ..model.entry import Entry, CreateEntryPayload, UpdateEntryPayload

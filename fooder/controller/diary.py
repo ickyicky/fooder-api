@@ -3,7 +3,6 @@ from fastapi import HTTPException
 
 from ..model.diary import Diary
 from ..domain.diary import Diary as DBDiary
-from ..domain.meal import Meal as DBMeal
 from .base import AuthorizedController
 
 

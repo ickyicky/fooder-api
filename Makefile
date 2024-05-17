@@ -14,15 +14,15 @@ push:
 	docker push registry.domandoman.xyz/fooder/api
 
 black:
-	black .
+	black fooder
 
 .PHONY: mypy
 mypy:
-	mypy .
+	mypy fooder
 
 .PHONY: flake
 flake:
-	flake8 .
+	flake8 fooder
 
 .PHONY: lint
 lint: black mypy flake

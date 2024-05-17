@@ -1,11 +1,9 @@
-from typing import AsyncIterator, Annotated
-
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
 from ..model.token import Token, RefreshTokenPayload
 from ..domain.user import User as DBUser
-from .base import BaseController, AsyncSession
+from .base import BaseController
 from ..auth import (
     authenticate_user,
     create_access_token,

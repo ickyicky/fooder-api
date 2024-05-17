@@ -1,5 +1,5 @@
-from .client import *
-from .user import *
-from .product import *
-from .meal import *
-from .entry import *
+from .client import *  # noqa
+from .user import *  # noqa
+from .product import *  # noqa
+from .meal import *  # noqa
+from .entry import *  # noqa

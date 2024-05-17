@@ -1,5 +1,3 @@
-from typing import AsyncIterator
-
 from fastapi import HTTPException
 
 from ..model.user import User, CreateUserPayload
