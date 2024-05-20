@@ -3,7 +3,7 @@ from sqlalchemy import ForeignKey, Integer, Date
 from sqlalchemy import select
 from sqlalchemy.sql.selectable import Select
 from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import date
+import datetime
 from typing import Optional
 
 from .base import Base, CommonMixin
@@ -17,7 +17,7 @@ class Diary(Base, CommonMixin):
     meals: Mapped[list[Meal]] = relationship(
         lazy="selectin", order_by=Meal.order.desc()
     )
-    date: Mapped[date] = mapped_column(Date)
+    date: Mapped[datetime.date] = mapped_column(Date)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
 
     @property
@@ -74,14 +74,16 @@ class Diary(Base, CommonMixin):
 
     @classmethod
     async def get_diary(
-        cls, session: AsyncSession, user_id: int, date: date
+        cls, session: AsyncSession, user_id: int, date: datetime.date
     ) -> "Optional[Diary]":
         """get_diary."""
         query = cls.query(user_id).where(cls.date == date)
         return await session.scalar(query)
 
     @classmethod
-    async def create(cls, session: AsyncSession, user_id: int, date: date) -> "Diary":
+    async def create(
+        cls, session: AsyncSession, user_id: int, date: datetime.date
+    ) -> "Diary":
         diary = Diary(
             date=date,
             user_id=user_id,
@@ -93,12 +95,13 @@ class Diary(Base, CommonMixin):
         except Exception:
             raise RuntimeError()
 
-        diary = await cls.get_by_id(session, user_id, diary.id)
+        db_diary = await cls.get_by_id(session, user_id, diary.id)
 
-        if not diary:
+        if not db_diary:
             raise RuntimeError()
-        await Meal.create(session, diary.id)
-        return diary
+
+        await Meal.create(session, db_diary.id)
+        return db_diary
 
     @classmethod
     async def get_by_id(

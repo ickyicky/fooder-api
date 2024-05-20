@@ -15,8 +15,8 @@ class Product(Base, CommonMixin):
     carb: Mapped[float]
     fat: Mapped[float]
     fiber: Mapped[float]
-    hard_coded_calories: Mapped[Optional[float]] = None
-    barcode: Mapped[Optional[str]] = None
+    hard_coded_calories: Mapped[Optional[float]]
+    barcode: Mapped[Optional[str]]
 
     @property
     def calories(self) -> float:

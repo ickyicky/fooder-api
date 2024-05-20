@@ -84,10 +84,10 @@ class Meal(Base, CommonMixin):
         except IntegrityError:
             raise AssertionError("diary does not exist")
 
-        meal = await cls._get_by_id(session, meal.id)
-        if not meal:
+        db_meal = await cls._get_by_id(session, meal.id)
+        if not db_meal:
             raise RuntimeError()
-        return meal
+        return db_meal
 
     @classmethod
     async def create_from_preset(
@@ -118,10 +118,10 @@ class Meal(Base, CommonMixin):
         for entry in preset.entries:
             await Entry.create(session, meal.id, entry.product_id, entry.grams)
 
-        meal = await cls._get_by_id(session, meal.id)
-        if not meal:
+        db_meal = await cls._get_by_id(session, meal.id)
+        if not db_meal:
             raise RuntimeError()
-        return meal
+        return db_meal
 
     @classmethod
     async def _get_by_id(cls, session: AsyncSession, id: int) -> "Optional[Meal]":

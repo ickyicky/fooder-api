@@ -47,18 +47,18 @@ class RefreshToken(Base, CommonMixin):
         :type token: str
         :rtype: "RefreshToken"
         """
-        token = cls(
+        db_token = cls(
             user_id=user_id,
             token=token,
         )
-        session.add(token)
+        session.add(db_token)
 
         try:
             await session.flush()
         except Exception:
             raise AssertionError("invalid token")
 
-        return token
+        return db_token
 
     async def delete(self, session: AsyncSession) -> None:
         """delete.

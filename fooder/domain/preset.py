@@ -63,7 +63,7 @@ class Preset(Base, CommonMixin):
     @classmethod
     async def create(
         cls, session: AsyncSession, user_id: int, name: str, meal: "Meal"
-    ) -> None:
+    ) -> "Preset":
         preset = Preset(user_id=user_id, name=name)
 
         session.add(preset)
@@ -76,7 +76,12 @@ class Preset(Base, CommonMixin):
         for entry in meal.entries:
             await PresetEntry.create(session, preset.id, entry)
 
-        return await cls.get(session, user_id, preset.id)
+        db_preset = await cls.get(session, user_id, preset.id)
+
+        if not db_preset:
+            raise RuntimeError()
+
+        return db_preset
 
     @classmethod
     async def list_all(

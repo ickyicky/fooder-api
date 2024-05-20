@@ -17,6 +17,6 @@ class CommonMixin:
 
         :rtype: str
         """
-        return cls.__name__.lower()
+        return cls.__name__.lower()  # type: ignore
 
     id: Mapped[int] = mapped_column(primary_key=True)

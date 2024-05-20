@@ -87,10 +87,10 @@ class Entry(Base, CommonMixin):
         except IntegrityError:
             raise AssertionError("meal or product does not exist")
 
-        entry = await cls._get_by_id(session, entry.id)
-        if not entry:
+        db_entry = await cls._get_by_id(session, entry.id)
+        if not db_entry:
             raise RuntimeError()
-        return entry
+        return db_entry
 
     async def update(
         self,
