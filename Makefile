@@ -14,15 +14,15 @@ push:
 	docker push registry.domandoman.xyz/fooder/api
 
 black:
-	black fooder
+	python -m black fooder
 
 .PHONY: mypy
 mypy:
-	mypy fooder
+	python -m mypy fooder
 
 .PHONY: flake
 flake:
-	flake8 fooder
+	python -m flake8 fooder
 
 .PHONY: lint
 lint: black mypy flake
@@ -34,7 +34,7 @@ version:
 .PHONY: create-venv
 create-venv:
 	python3 -m venv .venv --prompt="fooderapi-venv" --system-site-packages
-	bash -c "source .venv/bin/activate && pip install -r requirements_local.txt"
+	bash -c "source .venv/bin/activate && pip install -r requirements_local.txt && (echo y | mypy --install-types)"
 
 .PHONY: test
 test:
