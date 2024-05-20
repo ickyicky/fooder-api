@@ -15,11 +15,6 @@ on:
       - '**.py'
 
 jobs:
-  lint-test:
-    runs-on: ubuntu-latest
-    steps:
-
-jobs:
   linttest:
     runs-on: ubuntu-latest
     steps:
