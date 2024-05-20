@@ -23,6 +23,8 @@ else
   python -m pytest fooder --disable-warnings -sv
 fi
 
+status=$?
+
 # unset test env values
 unset POSTGRES_USER
 unset POSTGRES_DATABASE
@@ -32,3 +34,5 @@ unset REFRESH_SECRET
 
 # if exists, remove test.db
 [ -f test.db ] && rm test.db
+
+exit $status
