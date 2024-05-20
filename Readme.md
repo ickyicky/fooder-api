@@ -1,9 +1,6 @@
 # FOODER
 
-Simple API for food diary application. It uses FastAPI and async postgres for faster operation.
-
-I plan on developing a few clients for the API, for now only one is available:
-- [Fooder CLI Client](https://github.com/ickyicky/fooder-cli-client)
+Simple API for food diary application. It uses FastAPI and async postgres.
 
 ## Usage
 

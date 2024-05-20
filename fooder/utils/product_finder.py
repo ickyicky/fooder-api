@@ -48,6 +48,5 @@ def find(bar_code: str) -> Product:
             fiber=data["product"]["nutriments"].get("fiber_100g", 0.0),
         )
     except Exception as e:
-        raise e
         logger.error(e)
         raise ParseError()
