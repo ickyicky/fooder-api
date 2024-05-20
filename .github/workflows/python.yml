@@ -1,9 +1,26 @@
 name: Python lint and test
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+      - 'releases/**'
+    paths:
+      - '**.py'
+  pull_request:
+    branches:
+      - main
+      - 'releases/**'
+    paths:
+      - '**.py'
 
 jobs:
-  lint:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+
+jobs:
+  lint-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
