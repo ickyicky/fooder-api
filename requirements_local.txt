@@ -12,3 +12,4 @@ black
 flake8
 flake8-bugbear
 httpx
+aiosqlite
