@@ -18,3 +18,5 @@ jobs:
         run: black --check fooder
       - name: Run flake8
         run: flake8 fooder
+      - name: Run tests
+        run: ./test.sh
