@@ -16,7 +16,9 @@ if __name__ == "__main__":
     from .settings import Settings
 
     settings = Settings()
-    engine = sqlalchemy.create_engine(settings.DB_URI.replace("+asyncpg", ""))
+    engine = sqlalchemy.create_engine(
+        settings.DB_URI.replace("+asyncpg", "").replace("+aiosqlite", "")
+    )
 
     if args.create_tables:
         Base.metadata.create_all(engine)

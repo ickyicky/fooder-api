@@ -1,31 +1,17 @@
-import requests
+from fooder.app import app
+from httpx import AsyncClient
 import pytest
-import os
-import yaml
-
-
-def get_api_url(service_name) -> str:
-    with open("docker-compose.test.yml") as f:
-        config = yaml.safe_load(f)
-
-    port = config["services"][service_name]["ports"][0].split(":")[0]
-
-    return f"http://localhost:{port}/"
+import httpx
 
 
 class Client:
     def __init__(
         self,
-        base_url: str,
         username: str | None = None,
         password: str | None = None,
     ):
-        self.base_url = os.path.join(base_url, "api")
-        self.session = requests.Session()
-        self.session.headers["Accept"] = "application/json"
-
-        if username and password:
-            self.login(username, password, True)
+        self.client = AsyncClient(app=app, base_url="http://testserver/api")
+        self.client.headers["Accept"] = "application/json"
 
     def set_token(self, token: str) -> None:
         """set_token.
@@ -34,14 +20,14 @@ class Client:
         :type token: str
         :rtype: None
         """
-        self.session.headers["Authorization"] = "Bearer " + token
+        self.client.headers["Authorization"] = "Bearer " + token
 
-    def create_user(self, username: str, password: str) -> None:
+    async def create_user(self, username: str, password: str) -> None:
         data = {"username": username, "password": password}
-        response = self.post("user", json=data)
+        response = await self.post("user", json=data)
         response.raise_for_status()
 
-    def login(self, username: str, password: str, force_login: bool) -> None:
+    async def login(self, username: str, password: str, force_login: bool) -> None:
         """login.
 
         :param username:
@@ -54,40 +40,40 @@ class Client:
         """
         data = {"username": username, "password": password}
 
-        response = self.post("token", data=data)
+        response = await self.post("token", data=data)
 
         if response.status_code != 200:
             if force_login:
-                self.create_user(username, password)
-                return self.login(username, password, False)
+                await self.create_user(username, password)
+                return await self.login(username, password, False)
             else:
-                raise Exception(f"Could not login as {username}")
+                raise Exception(
+                    f"Could not login as {username}! Detail: {response.text}"
+                )
 
         result = response.json()
         self.set_token(result["access_token"])
 
-    def get(self, path: str, **kwargs) -> requests.Response:
-        return self.session.get(os.path.join(self.base_url, path), **kwargs)
+    async def get(self, path: str, **kwargs) -> httpx.Response:
+        return await self.client.get(path, **kwargs)
 
-    def delete(self, path: str, **kwargs) -> requests.Response:
-        return self.session.delete(os.path.join(self.base_url, path), **kwargs)
+    async def delete(self, path: str, **kwargs) -> httpx.Response:
+        return await self.client.delete(path, **kwargs)
 
-    def post(self, path: str, **kwargs) -> requests.Response:
-        return self.session.post(os.path.join(self.base_url, path), **kwargs)
+    async def post(self, path: str, **kwargs) -> httpx.Response:
+        return await self.client.post(path, **kwargs)
 
-    def patch(self, path: str, **kwargs) -> requests.Response:
-        return self.session.patch(os.path.join(self.base_url, path), **kwargs)
+    async def patch(self, path: str, **kwargs) -> httpx.Response:
+        return await self.client.patch(path, **kwargs)
 
 
 @pytest.fixture
 def unauthorized_client() -> Client:
-    return Client(get_api_url("api"))
+    return Client()
 
 
 @pytest.fixture
-def client(user_payload) -> Client:
-    return Client(
-        get_api_url("api"),
-        username=user_payload["username"],
-        password=user_payload["password"],
-    )
+async def client(user_payload) -> Client:
+    client = Client()
+    await client.login(user_payload["username"], user_payload["password"], True)
+    return client
