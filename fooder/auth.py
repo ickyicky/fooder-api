@@ -1,6 +1,5 @@
 from passlib.context import CryptContext
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from jose import JWTError, jwt
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException
@@ -108,10 +107,8 @@ async def create_refresh_token(session: AsyncSession, user: User) -> RefreshToke
     return await RefreshToken.create(session, token=encoded_jwt, user_id=user.id)
 
 
-async def get_current_user(
-    session: AsyncSessionDependency, token: TokenDependency
-) -> User:
-    async with session() as session:
+async def get_current_user(ssn: AsyncSessionDependency, token: TokenDependency) -> User:
+    async with ssn() as session:
         try:
             payload = jwt.decode(
                 token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
@@ -141,9 +138,7 @@ async def get_current_user(
         return user
 
 
-async def authorize_api_key(
-    session: AsyncSessionDependency, token: TokenDependency
-) -> None:
+async def authorize_api_key(token: TokenDependency) -> None:
     if token == settings.API_KEY:
         return None
     raise HTTPException(status_code=401, detail="Unathorized")

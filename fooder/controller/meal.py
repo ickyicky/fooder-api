@@ -29,7 +29,7 @@ class CreateMeal(AuthorizedController):
 
 
 class SaveMeal(AuthorizedController):
-    async def call(self, meal_id: id, payload: SaveMealPayload) -> Preset:
+    async def call(self, meal_id: int, payload: SaveMealPayload) -> Preset:
         async with self.async_session.begin() as session:
             meal = await DBMeal.get_by_id(session, self.user.id, meal_id)
             if meal is None:
@@ -38,7 +38,10 @@ class SaveMeal(AuthorizedController):
             try:
                 return Preset.from_orm(
                     await DBPreset.create(
-                        session, user_id=self.user.id, name=payload.name, meal=meal
+                        session,
+                        user_id=self.user.id,
+                        name=payload.name or meal.name,
+                        meal=meal,
                     )
                 )
             except AssertionError as e:
@@ -46,7 +49,7 @@ class SaveMeal(AuthorizedController):
 
 
 class DeleteMeal(AuthorizedController):
-    async def call(self, meal_id: id) -> None:
+    async def call(self, meal_id: int) -> None:
         async with self.async_session.begin() as session:
             meal = await DBMeal.get_by_id(session, self.user.id, meal_id)
             if meal is None:

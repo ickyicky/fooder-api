@@ -8,7 +8,7 @@ from ..domain.user import User
 
 AsyncSession = Annotated[async_sessionmaker, Depends(get_session)]
 UserDependency = Annotated[User, Depends(get_current_user)]
-ApiKeyDependency = Annotated[bool, Depends(authorize_api_key)]
+ApiKeyDependency = Annotated[None, Depends(authorize_api_key)]
 
 
 class BaseController:

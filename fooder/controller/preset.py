@@ -32,7 +32,7 @@ class DeletePreset(AuthorizedController):
     async def call(
         self,
         id: int,
-    ) -> AsyncIterator[Preset]:
+    ) -> None:
         async with self.async_session.begin() as session:
             preset = await DBPreset.get(session, self.user.id, id)
 

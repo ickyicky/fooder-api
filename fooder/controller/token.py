@@ -41,6 +41,11 @@ class RefreshToken(BaseController):
                 raise HTTPException(status_code=401, detail="Invalid token")
 
             user = await DBUser.get(session, current_token.user_id)
+
+            if user is None:
+                raise HTTPException(status_code=401, detail="Invalid token")
+
+            assert user is not None
             await current_token.delete(session)
 
             refresh_token = await create_refresh_token(session, user)

@@ -34,7 +34,7 @@ version:
 .PHONY: create-venv
 create-venv:
 	python3 -m venv .venv --prompt="fooderapi-venv" --system-site-packages
-	bash -c "source .venv/bin/activate && pip install -r requirements_local.txt && (echo y | mypy --install-types)"
+	bash -c "source .venv/bin/activate && pip install -r requirements_local.txt"
 
 .PHONY: test
 test:

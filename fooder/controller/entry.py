@@ -39,7 +39,7 @@ class UpdateEntry(AuthorizedController):
 
 
 class DeleteEntry(AuthorizedController):
-    async def call(self, entry_id: int) -> Entry:
+    async def call(self, entry_id: int) -> None:
         async with self.async_session.begin() as session:
             entry = await DBEntry.get_by_id(session, self.user.id, entry_id)
             if entry is None:

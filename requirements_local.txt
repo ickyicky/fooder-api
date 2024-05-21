@@ -15,3 +15,5 @@ httpx
 aiosqlite
 mypy
 types-requests
+types-passlib
+types-python-jose
