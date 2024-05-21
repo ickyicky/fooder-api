@@ -159,6 +159,6 @@ class Entry(Base, CommonMixin):
         cls,
         session: AsyncSession,
     ) -> None:
-        stmt = update(cls).where(cls.processed is False).values(processed=True)
+        stmt = update(cls).where(cls.processed == False).values(processed=True)
 
         await session.execute(stmt)
