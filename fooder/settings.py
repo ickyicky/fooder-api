@@ -15,3 +15,5 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
 
     ALLOWED_ORIGINS: List[str] = ["*"]
+
+    API_KEY: str

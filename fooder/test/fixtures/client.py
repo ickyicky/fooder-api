@@ -1,7 +1,9 @@
 from fooder.app import app
+from fooder.tasks_app import app as tasks_app
 from httpx import AsyncClient
 import pytest
 import httpx
+import os
 
 
 class Client:
@@ -67,9 +69,27 @@ class Client:
         return await self.client.patch(path, **kwargs)
 
 
+class TasksClient(Client):
+    def __init__(self, authorized: bool = True):
+        super().__init__()
+        self.client = AsyncClient(app=tasks_app, base_url="http://testserver/api")
+        self.client.headers["Accept"] = "application/json"
+
+        if authorized:
+            self.client.headers["Authorization"] = "Bearer " + self.get_token()
+
+    def get_token(self) -> str:
+        return os.getenv("API_KEY")
+
+
 @pytest.fixture
 def unauthorized_client() -> Client:
     return Client()
+
+
+@pytest.fixture
+def tasks_client() -> Client:
+    return TasksClient()
 
 
 @pytest.fixture

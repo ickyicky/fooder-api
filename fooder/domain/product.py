@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Mapped
-from sqlalchemy import select
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import select, BigInteger, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import AsyncIterator, Optional
 
@@ -17,6 +17,12 @@ class Product(Base, CommonMixin):
     fiber: Mapped[float]
     hard_coded_calories: Mapped[Optional[float]]
     barcode: Mapped[Optional[str]]
+
+    usage_count_cached: Mapped[int] = mapped_column(
+        BigInteger,
+        default=0,
+        nullable=False,
+    )
 
     @property
     def calories(self) -> float:
@@ -41,11 +47,13 @@ class Product(Base, CommonMixin):
 
         if q:
             q_list = q.split()
-            for qq in q_list:
-                query = query.filter(cls.name.ilike(f"%{qq.lower()}%"))
+            qq = "%" + "%".join(q_list) + "%"
+            query = query.filter(cls.name.ilike(f"%{qq.lower()}%"))
 
         query = query.offset(offset).limit(limit)
-        stream = await session.stream_scalars(query.order_by(cls.id))
+        stream = await session.stream_scalars(
+            query.order_by(cls.usage_count_cached.desc())
+        )
         async for row in stream:
             yield row
 
@@ -104,3 +112,28 @@ class Product(Base, CommonMixin):
         session.add(product)
         await session.flush()
         return product
+
+    @classmethod
+    async def cache_usage_data(
+        cls,
+        session: AsyncSession,
+    ) -> None:
+        from .entry import Entry
+
+        stmt = (
+            update(cls)
+            .where(
+                cls.id.in_(
+                    select(Entry.product_id).where(Entry.processed == False).distinct()
+                )
+            )
+            .values(
+                usage_count_cached=select(func.count(Entry.id)).where(
+                    Entry.product_id == cls.id,
+                    Entry.processed == False,
+                )
+            )
+        )
+
+        await session.execute(stmt)
+        await Entry.mark_processed(session)

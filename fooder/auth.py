@@ -101,3 +101,11 @@ async def get_current_user(
             raise HTTPException(status_code=401, detail="Unathorized")
 
         return await User.get_by_username(session, username)
+
+
+async def authorize_api_key(
+    session: AsyncSessionDependency, token: TokenDependency
+) -> None:
+    if token == settings.API_KEY:
+        return None
+    raise HTTPException(status_code=401, detail="Unathorized")

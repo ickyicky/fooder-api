@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship, joinedload
-from sqlalchemy import ForeignKey, Integer, DateTime
+from sqlalchemy import ForeignKey, Integer, DateTime, Boolean
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import select
+from sqlalchemy import select, update
 from datetime import datetime
 from typing import Optional
 
@@ -20,6 +20,7 @@ class Entry(Base, CommonMixin):
     last_changed: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
+    processed: Mapped[bool] = mapped_column(Boolean, default=False)
 
     @property
     def amount(self) -> float:
@@ -152,3 +153,12 @@ class Entry(Base, CommonMixin):
         """delete."""
         await session.delete(self)
         await session.flush()
+
+    @classmethod
+    async def mark_processed(
+        cls,
+        session: AsyncSession,
+    ) -> None:
+        stmt = update(cls).where(cls.processed is False).values(processed=True)
+
+        await session.execute(stmt)
